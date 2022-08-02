@@ -1,0 +1,275 @@
+#!/bin/bash
+#set -x 
+source .ssh-conf
+ARGC="${#}"
+ERR=$(getopt -o a:h:p:u: -l address:,host:,project:,user: -- ${@} 2>&1 1>/dev/null)
+
+set_arg() {
+    
+    check_arg "${1}" "${2}"
+    shift 3
+
+    while true;
+    do
+        case ${1} in
+
+            -a|--address)
+                address=${2}
+                shift 2
+            ;;
+
+            -h|--host)
+                host=${2}
+                shift 2
+            ;;
+
+            -p|--project)
+                project=${2}
+                shift 2
+            ;;
+
+            -u|--user)
+                user=${2}
+                shift 2
+            ;;
+
+            "")
+                break
+            ;;
+
+            --help|*)
+                OPT="help"
+                break
+            ;;
+        esac
+
+    done
+}
+
+check_arg() {
+
+    if [ ! "${ERR}" = "" ]; then
+        echo -e "${ERR#*: }\n"
+        # Optimize error message.
+        exit 1
+    fi
+
+    if [ "$(( ${2} * 2 ))" -gt "${ARGC}" ]; then
+        echo -e "Missing variable(s), requires ${2} variable(s).\n"
+        echo -e "${1}"
+        exit 1
+    fi
+}
+
+folder_exist() {
+
+    if [ -d ${1} ]; then 
+        true
+    else
+        false
+    fi
+}
+
+file_exist() {
+
+    if [ -f ${1} ]; then
+        true
+    else
+        false
+    fi
+}
+
+cfg_exist() {
+
+    grep "${1}" "${2}" &>/dev/null
+
+    if [ ${?} -eq 0 ]; then
+        true
+    else
+        false
+    fi
+}
+
+test_connect() {
+    
+    nc -z -w 1 ${address} ${1}
+    if [ ${?} -eq 0 ]; then
+        true
+    else
+        false
+    fi
+}
+
+create_file() {
+    echo "Create file: ${1}."
+
+    touch ${1}
+}
+
+create_folder() {
+    echo "Create folder: ${1}."
+    
+    mkdir -p ${1}
+}
+
+create_ssh_key() {
+    echo "Create key file: ${host}."
+
+    ssh-keygen -t rsa -b 4096 -f ${SSH_CONFIG_DIR}/${project}/key/${host} -q -N ""	&> /dev/null
+}
+
+append_local_cfg() {
+    echo "Append local cfg"
+
+    if ! cfg_exist "include ${project}" "${SSH_CONFIG_DIR}/config"; then
+        append_local_main_cfg
+        echo "Append \"include ${project}\" config in ${SSH_CONFIG_DIR}/config."
+    fi
+
+    if ! file_exist "${SSH_CONFIG_DIR}/${project}/config"; then
+
+        if ! folder_exist "${SSH_CONFIG_DIR}/${project}"; then
+            create_folder "${SSH_CONFIG_DIR}/${project}"
+        fi
+
+        create_file "${SSH_CONFIG_DIR}/${project}/config"
+    fi
+
+    if ! cfg_exist "Host ${host}" "${SSH_CONFIG_DIR}/${project}/config"; then
+        append_local_sub_cfg
+    else
+        echo "Host config exist."
+        exit 1
+    fi
+}
+
+append_local_main_cfg() {
+    echo "Append local main cfg"
+
+    echo "include ${project}/config" >>  ${SSH_CONFIG_DIR}/config
+}
+
+append_local_sub_cfg() {
+    echo "Append local sub cfg"
+
+    echo -e "Host ${host}\n" \
+        "	HostName ${address}\n" \
+        "	User ${user}\n" \
+        "	IdentityFile ${SSH_CONFIG_DIR}/${project}/key/${host}\n" \
+        >> ${SSH_CONFIG_DIR}/${project}/config
+}
+
+append_remote_cfg() {
+    echo "Append remote cfg"
+
+    if ! test_connect 22; then
+        echo "Can't arrived host(${address})."
+        exit 1
+    fi
+
+    if ! folder_exist "${SSH_CONFIG_DIR}/${project}/key"; then
+            create_folder ${SSH_CONFIG_DIR}/${project}/key
+    fi
+
+    if ! file_exist "${SSH_CONFIG_DIR}/${project}/key/${host}.pub" \
+        && ! file_exist "${SSH_CONFIG_DIR}/${project}/key/${host}"; then
+        
+        append_remote_ssh_key
+    else
+        echo "Key file exist."
+        exit 1
+    fi
+
+    # Use ssh connect host append cfg 
+}
+
+append_remote_ssh_key() {
+    echo "Append remote ssh key"
+
+    set_ssh_pass
+
+    create_ssh_key
+    setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${project}/key/${host} ${user}@${address} &> /dev/null
+    unset_ssh_pass
+}
+
+
+add_host() {
+
+    echo "project: ${project}, host: ${host}"
+
+    if ! folder_exist "${SSH_CONFIG_DIR}"; then
+        create_folder ${SSH_CONFIG_DIR}
+    fi
+
+    if ! file_exist "${SSH_CONFIG_DIR}/config"; then
+        create_file ${SSH_CONFIG_DIR}/config
+        echo "StrictHostKeyChecking no" > ${SSH_CONFIG_DIR}/config
+    elif cfg_exist "Host ${host}" "${SSH_CONFIG_DIR}/${project}/config"; then
+        # config append config of main or sub.
+        echo "Config exist."
+        exit 1
+    fi
+
+    echo "#--- Stage Remote ---#"
+    append_remote_cfg
+    # key gen.
+    echo "#--- Stage Local ---#"
+    append_local_cfg
+}
+
+set_ssh_pass() {
+    export DISPLAY=:0
+    export SSH_ASKPASS="/tmp/ssh_askpass"
+
+    read -ers -p "Please input your target host password: " PASSWD
+    echo ""
+    echo "echo ${PASSWD}" > ${SSH_ASKPASS}
+    chmod +x ${SSH_ASKPASS}
+}
+
+unset_ssh_pass() {
+    rm -f ${SSH_ASKPASS}
+}
+
+delete_host() {
+    echo 0
+}
+
+list() {
+    echo 0
+}
+
+
+case "${1}" in
+
+    test)
+        echo "test: ${OPT}"
+    ;;
+    
+    add)
+        set_arg "Usage: ${0} add [-p| --project project_name] [-h| --host host_name] \
+		\n		    [-u| --user login_name] [-a| --address ip_address] \
+		\n		    [options]" \
+            4 ${@} 
+        add_host
+    ;;
+
+    delete)
+        echo "delete: ${OPT}"
+    ;;
+
+    list)
+        echo "list: ${OPT}"
+    ;;
+
+    help|*)
+        echo -e "Usage: ${0} [OPTION] \n"
+        echo "	add		Add host ssh config in project list."
+        echo "	delete		Delete host ssh config in project list."
+        echo "	help		Print command options."
+        echo "	list		List host of project list."
+        echo "	test		Test function."
+    ;;
+esac
+
