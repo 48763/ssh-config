@@ -42,7 +42,7 @@ set_arg() {
                 shift 2
             ;;
 
-            --port)
+            -p|--port)
                 port=${2}
                 shift 2
             ;;
@@ -275,7 +275,7 @@ case "${1}" in
 		\n		  [-u| --user login_name] [-a| --address ip_address] \
         \n		  [-t| --test-connect] [-r| --remote-append] \
         \n		  [-i| --identity identity_file] [-g| --gen-key] \
-        \n		  [    --port port_number] [options]" \
+        \n		  [-p| --port port_number] [options]" \
             4 ${@} 
         add_host
     ;;
