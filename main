@@ -19,6 +19,11 @@ set_arg() {
                 shift 2
             ;;
 
+            -f|--folder)
+                folder=${2}
+                shift 2
+            ;;
+
             -g|--gen-key)
                 if [ ! "${identity_file}" ]; then
                     gen_key=true
@@ -37,9 +42,15 @@ set_arg() {
                 shift 2
             ;;
 
-            -p|--project)
-                project=${2}
+            --port)
+                port=${2}
                 shift 2
+            ;;
+
+            -r|--remote-append)
+                test_connect=true
+                remote_append=true
+                shift 1
             ;;
 
             -t|--test-connect)
@@ -111,7 +122,7 @@ cfg_exist() {
 
 test_connect() {
     
-    nc -z -w 1 ${address} ${1}
+    nc -z -w 1 ${address} ${1} &> /dev/null
     if [ ${?} -eq 0 ]; then
         true
     else
@@ -129,21 +140,20 @@ create_folder() {
 
 create_ssh_key() {
 
-    if ! folder_exist "${SSH_CONFIG_DIR}/${project}/key"; then
-        create_folder ${SSH_CONFIG_DIR}/${project}/key
+    if ! folder_exist "${SSH_CONFIG_DIR}/${folder}/key"; then
+        create_folder ${SSH_CONFIG_DIR}/${folder}/key
     fi
 
     # Condition use OR
-    if file_exist "${SSH_CONFIG_DIR}/${project}/key/${host}.pub" \
-        || file_exist "${SSH_CONFIG_DIR}/${project}/key/${host}"; then
+    if file_exist "${SSH_CONFIG_DIR}/${folder}/key/${host}.pub" \
+        || file_exist "${SSH_CONFIG_DIR}/${folder}/key/${host}"; then
 
-        echo "Key file already exist."
-        exit 1
+        echo "Key file has been duplicated."
+
+    else
+        # Type and bit.
+        ssh-keygen -t rsa -b 4096 -f ${SSH_CONFIG_DIR}/${folder}/key/${host} -q -N ""	&> /dev/null
     fi
-
-    # Type and bit.
-    ssh-keygen -t rsa -b 4096 -f ${SSH_CONFIG_DIR}/${project}/key/${host} -q -N ""	&> /dev/null
-
 }
 
 append_local_cfg() {
@@ -158,46 +168,40 @@ append_local_main_cfg() {
         create_file ${SSH_CONFIG_DIR}/config
     fi
 
-    if ! cfg_exist "include ${project}" "${SSH_CONFIG_DIR}/config"; then
-        echo "include ${project}/config" >>  ${SSH_CONFIG_DIR}/config
+    if ! cfg_exist "include ${folder}" "${SSH_CONFIG_DIR}/config"; then
+        echo "include ${folder}/config" >>  ${SSH_CONFIG_DIR}/config
     fi
 }
 
 append_local_sub_cfg() {
 
-    if ! file_exist "${SSH_CONFIG_DIR}/${project}/config"; then
+    if ! file_exist "${SSH_CONFIG_DIR}/${folder}/config"; then
 
-        if ! folder_exist "${SSH_CONFIG_DIR}/${project}"; then
-            create_folder "${SSH_CONFIG_DIR}/${project}"
+        if ! folder_exist "${SSH_CONFIG_DIR}/${folder}"; then
+            create_folder "${SSH_CONFIG_DIR}/${folder}"
         fi
 
-        create_file "${SSH_CONFIG_DIR}/${project}/config"
+        create_file "${SSH_CONFIG_DIR}/${folder}/config"
     fi
 
-    cfg="Host ${host}\n    HostName ${address}\n" \
+    cfg="Host ${host}\n    HostName ${address}\n    Port ${port:=22}\n" \
 
     if [ "${user}" ]; then
         cfg="${cfg}    User ${user}\n"
     fi
 
     if [ "${identity_file}" ] || [ "${gen_key}" ] ; then
-        cfg="${cfg}    IdentityFile ${identity_file:=${SSH_CONFIG_DIR}/${project}/key/${host}}\n"
+        cfg="${cfg}    IdentityFile ${identity_file:=${SSH_CONFIG_DIR}/${folder}/key/${host}}\n"
     fi
 
-    echo -e "${cfg}" >> ${SSH_CONFIG_DIR}/${project}/config
+    # dry-run
+    echo -e "${cfg}" # >> ${SSH_CONFIG_DIR}/${folder}/config
 }
 
 append_remote_cfg() {
     echo "Append remote cfg"
 
-    # IP should become to arg
-    if ! test_connect 22; then
-        echo "Can't arrived host(${address})."
-        exit 1
-    fi
-
     # append_remote_ssh_key
-
     # Use ssh connect host append cfg 
 }
 
@@ -205,11 +209,16 @@ append_remote_cfg() {
 append_remote_ssh_key() {
 
     set_ssh_pass
-    setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${project}/key/${host} ${user}@${address} &> /dev/null
+    setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${folder}/key/${host} ${user}@${address} &> /dev/null
     unset_ssh_pass
 }
 
 add_host() {
+
+    if [ "${test_connect}" ] && ! test_connect 22; then
+        echo "Can't arrived host(${address})."
+        exit 1
+    fi
 
     # Check permission.
     if ! folder_exist "${SSH_CONFIG_DIR}"; then
@@ -217,17 +226,17 @@ add_host() {
     fi
 
     # Check all config has exist the host name.
-    if cfg_exist "Host ${host}" "${SSH_CONFIG_DIR}/${project}/config"; then
+    if cfg_exist "Host ${host}" "${SSH_CONFIG_DIR}/${folder}/config"; then
         echo "Host already exist in config."
         exit 1
     fi
 
-    if [ "${test_connect}" ]; then
-        append_remote_cfg
-    fi
-
     if [ "${gen_key}" ]; then
         create_ssh_key
+    fi
+
+    if [ "${remote_append}" ]; then
+        echo append_remote_cfg
     fi
 
     append_local_cfg
@@ -262,11 +271,11 @@ case "${1}" in
     ;;
     
     add)
-        set_arg "Usage: ${0} add [-p| --project project_name] [-h| --host host_name] \
+        set_arg "Usage: ${0} add [-f| --folder folder_name] [-h| --host host_name] \
 		\n		  [-u| --user login_name] [-a| --address ip_address] \
         \n		  [-t| --test-connect] [-r| --remote-append] \
-        \n		  [-i| --identity identity_file] [-g| --gen-key]\
-		\n		  [options]" \
+        \n		  [-i| --identity identity_file] [-g| --gen-key] \
+        \n		  [    --port port_number] [options]" \
             4 ${@} 
         add_host
     ;;
