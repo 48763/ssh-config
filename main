@@ -19,9 +19,19 @@ set_arg() {
                 shift 2
             ;;
 
+            -g|--gen-key)
+                gen-key=true
+                shift 1
+            ;;
+
             -h|--host)
                 host=${2}
                 shift 2
+            ;;
+
+            -i|--identity)
+                identity_file=${2}
+                shift 1
             ;;
 
             -p|--project)
@@ -29,14 +39,14 @@ set_arg() {
                 shift 2
             ;;
 
-            -u|--user)
-                user=${2}
-                shift 2
-            ;;
-
             -t|--test-connect)
                 test=true
                 shift 1
+            ;;
+
+            -u|--user)
+                user=${2}
+                shift 2
             ;;
 
             "")
@@ -197,9 +207,8 @@ append_remote_cfg() {
 append_remote_ssh_key() {
     echo "Append remote ssh key"
 
-    create_ssh_key
-
     set_ssh_pass
+    # Try it on the mac os.
     setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${project}/key/${host} ${user}@${address} &> /dev/null
     unset_ssh_pass
 }
@@ -220,6 +229,10 @@ add_host() {
         # config append config of main or sub.
         echo "Config exist."
         exit 1
+    fi
+
+    if [ "${gen-key}" ]; then
+        create_ssh_key
     fi
 
     # key gen.
@@ -253,9 +266,8 @@ list() {
     echo 0
 }
 
-
 case "${1}" in
-
+    # The parameterization needs to be modified.
     test)
         echo "test: ${OPT}"
     ;;
@@ -264,6 +276,7 @@ case "${1}" in
         set_arg "Usage: ${0} add [-p| --project project_name] [-h| --host host_name] \
 		\n		  [-u| --user login_name] [-a| --address ip_address] \
         \n		  [-t| --test-connect] [-r| --remote-append] \
+        \n		  [-i| --identity identity_file] [-g| --gen-key]\
 		\n		  [options]" \
             4 ${@} 
         add_host
