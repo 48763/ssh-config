@@ -20,7 +20,9 @@ set_arg() {
             ;;
 
             -g|--gen-key)
-                gen_key=true
+                if [ ! "${identity_file}" ]; then
+                    gen_key=true
+                fi
                 shift 1
             ;;
 
@@ -31,6 +33,7 @@ set_arg() {
 
             -i|--identity)
                 identity_file=${2}
+                gen_key=
                 shift 2
             ;;
 
@@ -171,11 +174,17 @@ append_local_sub_cfg() {
         create_file "${SSH_CONFIG_DIR}/${project}/config"
     fi
 
-    echo -e "Host ${host}\n" \
-        "	HostName ${address}\n" \
-        "	User ${user}\n" \
-        "	IdentityFile ${SSH_CONFIG_DIR}/${project}/key/${host}\n" \
-        >> ${SSH_CONFIG_DIR}/${project}/config
+    cfg="Host ${host}\n    HostName ${address}\n" \
+
+    if [ "${user}" ]; then
+        cfg="${cfg}    User ${user}\n"
+    fi
+
+    if [ "${identity_file}" ] || [ "${gen_key}" ] ; then
+        cfg="${cfg}    IdentityFile ${identity_file:=${SSH_CONFIG_DIR}/${project}/key/${host}}\n"
+    fi
+
+    echo -e "${cfg}" >> ${SSH_CONFIG_DIR}/${project}/config
 }
 
 append_remote_cfg() {
@@ -192,14 +201,13 @@ append_remote_cfg() {
     # Use ssh connect host append cfg 
 }
 
-append_remote_ssh_key() {
 # Try it on the mac os.
+append_remote_ssh_key() {
 
     set_ssh_pass
     setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${project}/key/${host} ${user}@${address} &> /dev/null
     unset_ssh_pass
 }
-
 
 add_host() {
 
