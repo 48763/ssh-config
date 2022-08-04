@@ -64,6 +64,7 @@ set_arg() {
             ;;
 
             "")
+                folder=${folder:=default}
                 break
             ;;
 
@@ -271,11 +272,11 @@ case "${1}" in
     ;;
     
     add)
-        set_arg "Usage: ${0} add [-f| --folder folder_name] [-h| --host host_name] \
-		\n		  [-u| --user login_name] [-a| --address ip_address] \
-        \n		  [-t| --test-connect] [-r| --remote-append] \
-        \n		  [-i| --identity identity_file] [-g| --gen-key] \
-        \n		  [-p| --port port_number] [options]" \
+        set_arg "Usage: ${0} add [-a| --address ip_address] [-f| --folder folder_name] \
+		\n		  [-g| --gen-key] [-h| --host host_name] \
+        \n		  [-i| --identity identity_file] [-p| --port port_number] \
+        \n		  [-r| --remote-append] [-t| --test-connect] \
+        \n		  [-u| --user login_name] [options]" \
             4 ${@} 
         add_host
     ;;
@@ -290,10 +291,11 @@ case "${1}" in
 
     help|*)
         echo -e "Usage: ${0} [OPTION] \n"
-        echo "	add		Add host ssh config in project list."
-        echo "	delete		Delete host ssh config in project list."
+        echo "	add		Add host ssh config in folder."
+        echo "	delete		Delete host ssh config in folder."
         echo "	help		Print command options."
-        echo "	list		List host of project list."
+        echo "	list		List host of folder."
+        echo "	update		Update host ssh config."
         echo "	test		Test function."
     ;;
 esac
