@@ -1,11 +1,10 @@
 #!/bin/bash
-#set -x 
 # Conditions file exist.
 source .ssh.conf
 ARGC="${#}"
-ERR=$(getopt -o a:h:p:u: -l address:,host:,project:,user: -- ${@} 2>&1 1>/dev/null)
+ERR=$(getopt -o a:g:h:u: -l address:,group:,host:,user: -- ${@} 2>&1 1>/dev/null)
 
-set_arg() {
+set_args() {
     
     check_arg "${1}" "${2}"
     shift 3
@@ -265,38 +264,51 @@ list() {
     echo 0
 }
 
-case "${1}" in
-    # The parameterization needs to be modified.
-    test)
-        echo "test: ${OPT}"
-    ;;
-    
-    add)
-        set_arg "Usage: ${0} add [-a| --address ip_address] [-f| --folder folder_name] \
-		\n		  [-g| --gen-key] [-h| --host host_name] \
-        \n		  [-i| --identity identity_file] [-p| --port port_number] \
-        \n		  [-r| --remote-append] [-t| --test-connect] \
-        \n		  [-u| --user login_name] [options]" \
-            4 ${@} 
-        add_host
-    ;;
+main_cmd () {
+    case "${1}" in
+        # The parameterization needs to be modified.
+        test)
+            echo "test: ${OPT}"
+        ;;
+        
+        add)
+            set_args "Usage: ${0} add [-a| --address ip_address] [-f| --folder folder_name] \
+            \n		  [-g| --gen-key] [-h| --host host_name] \
+            \n		  [-i| --identity identity_file] [-p| --port port_number] \
+            \n		  [-r| --remote-append] [-t| --test-connect] \
+            \n		  [-u| --user login_name] [options]" \
+                4 ${@} 
+            add_host
+        ;;
 
-    delete)
-        echo "delete: ${OPT}"
-    ;;
+        aws)
+            source aws.sh
+            aws_cmd ${@}
+        ;;
 
-    list)
-        echo "list: ${OPT}"
-    ;;
+        delete)
+            echo "${@}"
+        ;;
 
-    help|*)
-        echo -e "Usage: ${0} [OPTION] \n"
-        echo "	add		Add host ssh config in folder."
-        echo "	delete		Delete host ssh config in folder."
-        echo "	help		Print command options."
-        echo "	list		List host of folder."
-        echo "	update		Update host ssh config."
-        echo "	test		Test function."
-    ;;
-esac
+        list)
+            echo "${@}"
+        ;;
 
+        update)
+            echo "${@}"
+        ;;
+
+        help|*)
+            echo -e "Usage: ${0} [OPTION] \n"
+            echo "	add		Add host ssh config in folder."
+            echo "	aws		AWS."
+            echo "	delete		Delete host ssh config in folder."
+            echo "	help		Print command options."
+            echo "	list		List host of folder."
+            echo "	update		Update host ssh config."
+            echo "	test		Test function."
+        ;;
+    esac
+}
+
+main_cmd ${@}
