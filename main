@@ -2,7 +2,7 @@
 # Conditions file exist.
 source .ssh.conf
 ARGC="${#}"
-ERR=$(getopt -o a:g:h:u: -l address:,group:,host:,user: -- ${@} 2>&1 1>/dev/null)
+ERR=$(getopt -o a:g:h:u: -l ip-address:,group:,host:,user: -- ${@} 2>&1 1>/dev/null)
 
 set_args() {
     
@@ -13,8 +13,8 @@ set_args() {
     do
         case ${1} in
 
-            -a|--address)
-                address=${2}
+            -a|--ip-address)
+                ip_address=${2}
                 shift 2
             ;;
 
@@ -122,7 +122,7 @@ cfg_exist() {
 
 test_connect() {
     
-    nc -z -w 1 ${address} ${1} &> /dev/null
+    nc -z -w 1 ${ip_address} ${1} &> /dev/null
     if [ ${?} -eq 0 ]; then
         true
     else
@@ -184,7 +184,7 @@ append_local_sub_cfg() {
         create_file "${SSH_CONFIG_DIR}/${folder}/config"
     fi
 
-    cfg="Host ${host}\n    HostName ${address}\n    Port ${port:=22}\n" \
+    cfg="Host ${host}\n    HostName ${ip_address}\n    Port ${port:=22}\n" \
 
     if [ "${user}" ]; then
         cfg="${cfg}    User ${user}\n"
@@ -209,14 +209,14 @@ append_remote_cfg() {
 append_remote_ssh_key() {
 
     set_ssh_pass
-    setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${folder}/key/${host} ${user}@${address} &> /dev/null
+    setsid ssh-copy-id -i ${SSH_CONFIG_DIR}/${folder}/key/${host} ${user}@${ip_address} &> /dev/null
     unset_ssh_pass
 }
 
 add_host() {
 
     if [ "${test_connect}" ] && ! test_connect 22; then
-        echo "Can't arrived host(${address})."
+        echo "Can't arrived host(${ip_address})."
         exit 1
     fi
 
@@ -272,7 +272,7 @@ main_cmd () {
         ;;
         
         add)
-            set_args "Usage: ${0} add [-a| --address ip_address] [-f| --folder folder_name] \
+            set_args "Usage: ${0} add [-a| --ip-address ip_address] [-f| --folder folder_name] \
             \n		  [-g| --gen-key] [-h| --host host_name] \
             \n		  [-i| --identity identity_file] [-p| --port port_number] \
             \n		  [-r| --remote-append] [-t| --test-connect] \
