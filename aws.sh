@@ -1,86 +1,37 @@
 #!/bin/bash
+source args.sh
+source file-ctl.sh
 
-set_args() {
-    echo set_args
-
-    check_arg "${1}" "${2}"
-    shift 4
-
-    while true;
-    do
-        case ${1} in
-
-            -i|--identity)
-                identity_file=${2}
-                shift 2
-            ;;
-
-            -P|--public)
-                public=${2:-"true"}
-                shift 1
-            ;;
-
-            -p|--profile)
-                profile_name=${2}
-                shift 2
-            ;;
-
-            -r|--region)
-                region=${2}
-                shift 2
-            ;;
-            
-            -t|--test-connect)
-                test_connect=true
-                shift 1
-            ;;
-            
-            -u|--user)
-                user=${2}
-                shift 2
-            ;;
-
-            "")
-                profile=${profile:=default}
-                break
-            ;;
-
-            --help|*)
-                OPT="help"
-                break
-            ;;
-        esac
-
-    done
+aws_get_json() {
+    echo aws_get_json
+    aws ec2 describe-instances \
+        --region ${region} \
+        --profile ${profile} 2> /dev/null
+    
 }
 
-check_arg() {
-    echo check_arg
-
-    if [ ! "${ERR}" = "" ]; then
-        echo -e "${ERR#*: }\n"
-        # Optimize error message.
-        exit 1
-    fi
-
-    if [ "$(( ${2} * 2 ))" -gt "${ARGC}" ]; then
-        echo -e "Missing variable(s).\n"
-        echo -e "${1}"
-    fi
-
+aws_append_local_cfg() {
+    echo aws_append_local_cfg
 }
 
 aws_gen() {
-
     echo aws_gen
+
+    json=$(aws_get_json)
+    if [ $? -ne 0 ]; then 
+        echo faile
+        #exit 1
+    fi
+
+    echo -e "return ${json}"
+    aws_append_local_cfg
 }
 
 aws_cmd() {
 
     case "${2}" in
-        # The parameterization needs to be modified.
         gen)
-            set_args "Usage: ${0} add \
+            aws_set_args "Usage: ${0} add \
             \n		  [-i| --identity identity_file] \
             \n		  [-P| --public true|false] \
             \n		  [-p| --profile profile_name] \
@@ -105,4 +56,3 @@ aws_cmd() {
         ;;
     esac
 }
-
