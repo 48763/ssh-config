@@ -86,7 +86,6 @@ manual_set_args() {
 }
 
 aws_set_args() {
-    echo set_args
 
     check_arg "${1}" "${2}"
     shift 4
@@ -96,17 +95,18 @@ aws_set_args() {
         case ${1} in
 
             -i|--identity)
-                identity_file=${2}
+                identity_file="${2}"
                 shift 2
             ;;
 
             -P|--public)
-                public=${2:-"true"}
+                #public="PublicIpAddress"
+                address="PublicIpAddress"
                 shift 1
             ;;
 
             -p|--profile)
-                profile_name=${2}
+                profile=${2}
                 shift 2
             ;;
 
@@ -116,17 +116,16 @@ aws_set_args() {
             ;;
             
             -t|--test-connect)
-                test_connect=true
+                test_connect="true"
                 shift 1
             ;;
             
             -u|--user)
-                user=${2}
+                user="${2}"
                 shift 2
             ;;
 
             "")
-                profile=${profile:=default}
                 break
             ;;
 
