@@ -41,7 +41,7 @@ append_local_sub_cfg() {
     fi
 
     # dry-run
-    echo -e "${cfg}" # >> ${SSH_CONFIG_DIR}/${folder}/config
+    echo -e "${cfg}" >> ${SSH_CONFIG_DIR}/${folder}/config
 }
 
 append_remote_cfg() {

@@ -92,13 +92,9 @@ aws_cmd() {
 
     case "${2}" in
         gen)
-            help="Usage: ${0} ${1} ${2} \
-            \n		  [-i| --identity identity_file] \
-            \n		  [-P| --public true|false] \
-            \n		  [-p| --profile profile_name] \
-            \n		  [-r| --region region_name] \
-            \n		  [-t| --test-connect] \
-            \n		  [-u| --user login_name] \
+            help="Usage: ${0} ${1} ${2} [-i| --identity identity_file] [-P| --public true|false] \
+            \n		      [-p| --profile profile_name] [-r| --region region_name] \
+            \n		      [-t| --test-connect] [-u| --user login_name] \
             "
 
             aws_set_args 1 ${@}
