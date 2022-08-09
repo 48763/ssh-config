@@ -7,7 +7,7 @@ main() {
     case "${1}" in
         # The parameterization needs to be modified.
         test)
-            echo "test: ${OPT}"
+            echo "test: ${@}"
         ;;
         
         add)
@@ -45,4 +45,4 @@ main() {
     esac
 }
 
-main ${@}
+main ${@} null

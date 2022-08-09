@@ -31,23 +31,22 @@ aws_append_local_cfg() {
     do
         index=$(( ${index} - 1 ))
 
-        cfg="Host ${!region}-$(get_json_value "${1}" ${index} Name)\n"
+        cfg="Host ${!region}$(get_json_value "${1}" ${index} Name)\n"
         cfg="${cfg}    HostName $(get_json_value "${1}" ${index} IP)\n"
         # User Map
-        cfg="${cfg}    User ${user:=ubuntu}\n"
-        cfg="${cfg}    IdentityFile ${SSH_CONFIG_DIR}/$(get_json_value "${1}" ${index} key)\n"
+        cfg="${cfg}    User ${user:=${AWS_USER}}\n"
+        cfg="${cfg}    IdentityFile ${AWS_KEY_DIR}/$(get_json_value "${1}" ${index} key)\n"
 
         echo -e "${cfg}" # >>
     done
 }
 
 aws_set_region() {
-    region=${region:=ap-northeast-1}
+    region=${region:=${AWS_REGION}}
 }
 
 aws_gen() {
     #echo aws_gen
-    aws_set_region
     
     json=$(aws_get_json)
     if [ $? -ne 0 ]; then 
@@ -62,16 +61,16 @@ aws_cmd() {
 
     case "${2}" in
         gen)
-            aws_set_args "Usage: ${0} add \
+            help="Usage: ${0} ${1} ${2} \
             \n		  [-i| --identity identity_file] \
             \n		  [-P| --public true|false] \
             \n		  [-p| --profile profile_name] \
             \n		  [-r| --region region_name] \
             \n		  [-t| --test-connect] \
             \n		  [-u| --user login_name] \
-            "\
-            1 ${@}
+            "
 
+            aws_set_args 1 ${@}
             aws_gen
         ;;
 

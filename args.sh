@@ -6,17 +6,17 @@ check_arg() {
         exit 1
     fi
 
-    if [ "$(( ${2} * 2 ))" -gt "${ARGC}" ]; then
-        echo -e "Missing variable(s), requires ${2} variable(s).\n"
-        echo -e "${1}"
+    if [ "$(( ${1} * 2 ))" -gt "${ARGC}" ]; then
+        echo -e "Missing variable(s), requires ${1} variable(s).\n"
+        echo -e "${help}"
         exit 1
     fi
 }
 
 manual_set_args() {
     
-    check_arg "${1}" "${2}"
-    shift 3
+    check_arg "${1}"
+    shift 2
 
     while true;
     do
@@ -71,14 +71,14 @@ manual_set_args() {
                 shift 2
             ;;
 
-            "")
+            null)
                 folder=${folder:=default}
                 break
             ;;
 
             --help|*)
-                OPT="help"
-                break
+                echo -e "${help}"
+                exit 1
             ;;
         esac
 
@@ -87,8 +87,8 @@ manual_set_args() {
 
 aws_set_args() {
 
-    check_arg "${1}" "${2}"
-    shift 4
+    check_arg "${1}"
+    shift 3
 
     while true;
     do
@@ -125,13 +125,14 @@ aws_set_args() {
                 shift 2
             ;;
 
-            "")
+            null)
+                aws_set_region
                 break
             ;;
 
             --help|*)
-                OPT="help"
-                break
+                echo -e "${help}"
+                exit 1
             ;;
         esac
 
