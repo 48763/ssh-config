@@ -127,6 +127,8 @@ aws_set_args() {
 
             null)
                 aws_set_region
+                profile=${profile:=default}
+                folder="aws${profile:+/${profile}/}${region}"
                 break
             ;;
 
