@@ -15,13 +15,12 @@
 $ ./main         
 Usage: ./main [OPTION] 
 
-	add		Add host ssh config in folder.
-	aws		Use aws command line to generate or delete ssh host config.
-	delete		Delete host ssh config in folder.
-	help		Print command options.
-	list		List host of folder.
-	update		Update host ssh config.
-	test		Test function.
+	add		Add host config at folder.
+	aws		Use aws command line to generate or delete host config.
+	delete		Delete host config at folder.
+	help		Get help for commands.
+	list		List hosts at folder.
+	update		Update host config.
 ```
 
 - [添加](#添加)
@@ -48,8 +47,8 @@ Host 48763
 $ ./main aws 
 Usage: ./main aws [OPTION] 
 
-	gen		Generate aws host ssh config to profile folder.
-	delete		Delete aws host ssh config profile folder.
+	gen		Generate aws host config with profile of aws.
+	delete		Delete aws profile folder of host config.
 	help		Print command options.
 ```
 
