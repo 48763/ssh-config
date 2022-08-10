@@ -113,11 +113,11 @@ list() {
 cmd() {
     case "${1}" in
         add)
-            help="Usage: ${0} ${1} [-a| --ip-address ip_address] [-f| --folder folder_name] \
-            \n		  [-g| --gen-key] [-h| --host host_name] \
-            \n		  [-i| --identity identity_file] [-p| --port port_number] \
-            \n		  [-r| --remote-append] [-t| --test-connect] \
-            \n		  [-u| --user login_name] [options] \
+            help="Usage: ${0} ${1} [-a, --ip-address ip_address] [-f, --folder folder_name] \
+            \n		  [-g, --gen-key] [-h, --host host_name] \
+            \n		  [-i, --identity identity_file] [-p, --port port_number] \
+            \n		  [-r, --remote-append] [-t, --test-connect] \
+            \n		  [-u, --user login_name] [options] \
             "
 
             manual_set_args 1 ${@}
