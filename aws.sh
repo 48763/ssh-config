@@ -92,9 +92,9 @@ aws_cmd() {
 
     case "${2}" in
         gen)
-            help="Usage: ${0} ${1} ${2} [-i| --identity identity_file] [-P| --public true|false] \
-            \n		      [-p| --profile profile_name] [-r| --region region_name] \
-            \n		      [-t| --test-connect] [-u| --user login_name] \
+            help="Usage: ${0} ${1} ${2} [-i, --identity identity_file] [-P, --public] \
+            \n		      [-p, --profile profile_name] [-r, --region region_name] \
+            \n		      [-t, --test-connect] [-u, --user login_name] \
             "
 
             aws_set_args 1 ${@}
@@ -107,9 +107,9 @@ aws_cmd() {
 
         help|*)
             echo -e "Usage: ${0} ${1} [OPTION] \n"
-            echo "	gen		Generate aws host ssh config to folder."
-            echo "	delete		Delete aws host ssh config in folder."
-            echo "	help		Print command options."
+            echo "	gen		Generate aws host config with profile of aws."
+            echo "	delete		Delete aws profile folder of host config."
+            echo "	help		Get help for commands."
         ;;
     esac
 }

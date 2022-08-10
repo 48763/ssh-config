@@ -6,10 +6,7 @@ ERR=$(getopt -o a:g:h:u: -l ip-address:,group:,host:,user: -- ${@} 2>&1 1>/dev/n
 main() {
     case "${1}" in
         # The parameterization needs to be modified.
-        test)
-            echo "test: ${@}"
-        ;;
-        
+                
         add)
             source manual.sh
             cmd ${@} 
@@ -34,13 +31,12 @@ main() {
 
         help|*)
             echo -e "Usage: ${0} [OPTION] \n"
-            echo "	add		Add host ssh config in folder."
-            echo "	aws		AWS."
-            echo "	delete		Delete host ssh config in folder."
-            echo "	help		Print command options."
-            echo "	list		List host of folder."
-            echo "	update		Update host ssh config."
-            echo "	test		Test function."
+            echo "	add		Add host config at folder."
+            echo "	aws		Use aws command line to generate or delete host config."
+            echo "	delete		Delete host config at folder."
+            echo "	help		Get help for commands."
+            echo "	list		List hosts at folder."
+            echo "	update		Update host config."
         ;;
     esac
 }
