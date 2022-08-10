@@ -49,6 +49,20 @@ $SSH_CONFIG_DIR=./ssh
 
 `add` 可以透過多個變數，以生成對應的 `ssh/config`：
 
+| 選項 | 說明 |
+| - | - |
+| -a, --ip-address | 設置遠端主機的 IP 位址 |
+| -f, --folder | 指定配置存放的路徑，預設為 `default` |
+| -g, --gen-key | 設置遠端登入使用的金鑰路徑 |
+| -h, --host  | 設置遠端主機的 host |
+| -i, --identity  | 設置遠端登入使用的金鑰路徑 |
+| -p, --port  | 設置遠端主機的傳輸埠 |
+| -r, --remote-append | 添加公鑰到遠端主機的 `authorized_keys`，使用後將會包含 `-t` |
+| -t, --test-connect | 使用後，會測試 IP 可連線才會寫入配置 |
+| -u, --user  | 設置遠端登入的用戶名稱 |
+
+#### 範例
+
 ```
 $ ./main add -h 48763 -a 127.0.0.1 -i ~/.ssh/id_rsa -u yuki -p 2222 -f test
 
@@ -85,12 +99,12 @@ $ ./main aws gen [OPTIONS]
 
 | 選項 | 說明 |
 | - | - |
-| -i, --identity | 設置遠端登入使用的金鑰路徑 |
+| -i, --identity | 設置遠端登入使用的金鑰路徑，預設為 aws `KeyName` |
 | -P, --public | 使用後，僅會輸出有公有 IP 的主機 |
-| -p, --profile | 指定 **AWS** 的命名設定檔 |
-| -r, --region | 指定 **AWS** 的區域 |
+| -p, --profile | 指定 **AWS** 的命名設定檔，預設為 `default` |
+| -r, --region | 指定 **AWS** 的區域，預設為 `us-east-2` |
 | -t, --test-connect | 使用後，會測試 IP 可連線才會寫入配置 |
-| -u, --user | 設置遠端登入的用戶名稱 |
+| -u, --user | 設置遠端登入的用戶名稱，預設為 `ubuntu` |
 
 
 #### 使用範例
