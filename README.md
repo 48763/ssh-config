@@ -2,17 +2,28 @@
 
 透過 `ssh-config` 指令設置本地端的 *ssh* `config`。
 
+- [安裝](#安裝)
 - [手動](#手動)
 - [AWS](#aws)
 
-> 目前該專案的大部分功能，都尚未實現。所以有列出來的子項目，都是能夠使用。
+> 目前該專案的大部分功能尚未實現。所以有列出來的子項目，都是能夠使用。
 
-## 手動
+## 安裝
 
+### Mac
 
+使用下面指令，克隆該專案與安裝相依套件 - `jq`：
 
+```bash
+$ https://github.com/48763/ssh-config.git
+$ brew install jq
 ```
-$ ./main         
+
+直接使用 `main` 就能使用：
+
+```bash
+$ cd ssh-config
+$ ./main
 Usage: ./main [OPTION] 
 
 	add		Add host config at folder.
@@ -23,9 +34,18 @@ Usage: ./main [OPTION]
 	update		Update host config.
 ```
 
-- [添加](#添加)
+如果要指定 ssh 的配置生成目錄，請修改 `.ssh.conf` 中的 `SSH_CONFIG_DIR`：
 
-### 添加
+```bash
+$ vi .ssh.conf
+$SSH_CONFIG_DIR=./ssh
+```
+
+## 手動
+
+- [添加單一主機](#添加單一主機)
+
+### 添加單一主機
 
 `add` 可以透過多個變數，以生成對應的 `ssh/config`：
 
@@ -41,9 +61,9 @@ Host 48763
 
 ## AWS
 
+`main aws` 會透過 **AWS** 的指令獲取主機資訊，以產生遠端配置檔。
 
-
-```
+```bash
 $ ./main aws 
 Usage: ./main aws [OPTION] 
 
@@ -52,9 +72,28 @@ Usage: ./main aws [OPTION]
 	help		Print command options.
 ```
 
-### 生成
+- [生成配置](#生成配置)
 
-`aws` 命令是透過 **AWS** 的指令 - `aws ec2 describe-instances` 獲取主機資訊，藉由該資訊生成 `ssh/config`：
+
+### 生成配置
+
+`main aws gen` 的使用如下 
+
+```bash
+$ ./main aws gen [OPTIONS]
+```
+
+| 選項 | 說明 |
+| - | - |
+| -i, --identity | 設置遠端登入使用的金鑰路徑 |
+| -P, --public | 使用後，僅會輸出有公有 IP 的主機 |
+| -p, --profile | 指定 **AWS** 的命名設定檔 |
+| -r, --region | 指定 **AWS** 的區域 |
+| -t, --test-connect | 使用後，會測試 IP 可連線才會寫入配置 |
+| -u, --user | 設置遠端登入的用戶名稱 |
+
+
+#### 使用範例
 
 ```
 $ ./main aws gen -P -p tw -u yuki
