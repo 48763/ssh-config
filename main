@@ -8,12 +8,12 @@ main() {
         # The parameterization needs to be modified.
                 
         add)
-            source manual.sh
+            source modules/manual.sh
             cmd ${@} 
         ;;
 
         aws)
-            source aws.sh
+            source modules/aws.sh
             aws_cmd ${@}
         ;;
 

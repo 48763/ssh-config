@@ -1,6 +1,6 @@
 #!/bin/bash
-source args.sh
-source file-ctl.sh
+source modules/args.sh
+source modules/file-ctl.sh
 
 append_local_cfg() {
 
