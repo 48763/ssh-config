@@ -24,8 +24,8 @@ main() {
         help|*)
             echo -e "Usage: ${0} [OPTION] \n"
             echo "	aws		Use *aws* command line to auto-generate or delete host config."
-            echo "	gcp		Use *gcloud* command line to auto-generate or delete host config."
             echo "	common		Use command line to generate or delete host config."
+            echo "	gcp		Use *gcloud* command line to auto-generate or delete host config."
             echo "	help		Get help for commands."
         ;;
     esac
