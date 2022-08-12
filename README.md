@@ -3,7 +3,7 @@
 透過 `ssh-config` 指令設置本地端的 *ssh* `config`。
 
 - [安裝](#安裝)
-- [手動](#手動)
+- [一般](#一般)
 - [AWS](#aws)
 
 > 目前該專案的大部分功能尚未實現。所以有列出來的子項目，都是能夠使用。
@@ -26,12 +26,10 @@ $ cd ssh-config
 $ ./main
 Usage: ./main [OPTION] 
 
-	add		Add host config at folder.
-	aws		Use aws command line to generate or delete host config.
-	delete		Delete host config at folder.
+	aws		Use *aws* command line to auto-generate or delete host config.
+	common		Use command line to generate or delete host config.
+	gcp		Use *gcloud* command line to auto-generate or delete host config.
 	help		Get help for commands.
-	list		List hosts at folder.
-	update		Update host config.
 ```
 
 如果要指定 ssh 的配置生成目錄，請修改 `.ssh.conf` 中的 `SSH_CONFIG_DIR`：
@@ -41,7 +39,19 @@ $ vi .ssh.conf
 $SSH_CONFIG_DIR=./ssh
 ```
 
-## 手動
+## 一般
+
+`main common` 會透過接受的參數，產生對應的遠端配置檔，預設存放路徑 `$SSH_CONFIG_DIR/default`。
+
+```
+Usage: ./main common [OPTION] 
+
+	add		Add host config at folder.
+	delete		Delete host config at folder.
+	help		Get help for commands.
+	list		List hosts at folder.
+	update		Update host config.
+```
 
 - [添加單一主機](#添加單一主機)
 
