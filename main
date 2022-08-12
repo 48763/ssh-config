@@ -6,37 +6,27 @@ ERR=$(getopt -o a:g:h:u: -l ip-address:,group:,host:,user: -- ${@} 2>&1 1>/dev/n
 main() {
     case "${1}" in
         # The parameterization needs to be modified.
-                
-        add)
-            source modules/manual.sh
-            cmd ${@} 
-        ;;
 
         aws)
             source modules/aws.sh
             aws_cmd ${@}
         ;;
 
-        delete)
-            echo "${@}"
+        common)
+            source modules/common.sh
+            cmd ${@}
         ;;
 
-        list)
-            echo "${@}"
-        ;;
-
-        update)
+        gcp)
             echo "${@}"
         ;;
 
         help|*)
             echo -e "Usage: ${0} [OPTION] \n"
-            echo "	add		Add host config at folder."
-            echo "	aws		Use aws command line to generate or delete host config."
-            echo "	delete		Delete host config at folder."
+            echo "	aws		Use *aws* command line to auto-generate or delete host config."
+            echo "	gcp		Use *gcloud* command line to auto-generate or delete host config."
+            echo "	common		Use command line to generate or delete host config."
             echo "	help		Get help for commands."
-            echo "	list		List hosts at folder."
-            echo "	update		Update host config."
         ;;
     esac
 }

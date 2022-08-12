@@ -16,7 +16,7 @@ check_arg() {
 manual_set_args() {
     
     check_arg "${1}"
-    shift 2
+    shift 3
 
     while true;
     do

@@ -41,7 +41,7 @@ append_local_sub_cfg() {
     fi
 
     # dry-run
-    echo -e "${cfg}" >> ${SSH_CONFIG_DIR}/${folder}/config
+    echo -e "${cfg}" #>> ${SSH_CONFIG_DIR}/${folder}/config
 }
 
 append_remote_cfg() {
@@ -111,7 +111,7 @@ list() {
 }
 
 cmd() {
-    case "${1}" in
+    case "${2}" in
         add)
             help="Usage: ${0} ${1} [-a, --ip-address ip_address] [-f, --folder folder_name] \
             \n		  [-g, --gen-key] [-h, --host host_name] \
@@ -134,6 +134,15 @@ cmd() {
 
         update)
             echo "${@}"
+        ;;
+
+        help|*)
+            echo -e "Usage: ${0} ${1} [OPTION] \n"
+            echo "	add		Add host config at folder."
+            echo "	delete		Delete host config at folder."
+            echo "	help		Get help for commands."
+            echo "	list		List hosts at folder."
+            echo "	update		Update host config."
         ;;
     esac
 
