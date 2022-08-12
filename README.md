@@ -12,10 +12,10 @@
 
 ### Mac
 
-使用下面指令，克隆該專案與安裝相依套件 - `jq`：
+使用下面指令，`git clone` 該專案與安裝相依套件 - `jq`：
 
 ```bash
-$ https://github.com/48763/ssh-config.git
+$ git clone https://github.com/48763/ssh-config.git
 $ brew install jq
 ```
 
