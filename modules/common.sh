@@ -137,7 +137,7 @@ cmd() {
         ;;
 
         help|*)
-            echo -e "Usage: ${0} ${1} [OPTION] \n"
+            echo -e "Usage: ${0##*/} ${1} [OPTION] \n"
             echo "	add		Add host config at folder."
             echo "	delete		Delete host config at folder."
             echo "	help		Get help for commands."

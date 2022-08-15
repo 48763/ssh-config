@@ -106,7 +106,7 @@ aws_cmd() {
         ;;
 
         help|*)
-            echo -e "Usage: ${0} ${1} [OPTION] \n"
+            echo -e "Usage: ${0##*/} ${1} [OPTION] \n"
             echo "	gen		Generate aws host config with profile of aws."
             echo "	delete		Delete aws profile folder of host config."
             echo "	help		Get help for commands."
