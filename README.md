@@ -16,15 +16,27 @@
 
 ```bash
 $ git clone https://github.com/48763/ssh-config.git
+$ ln -s ssh-config/ssh-config ~/tools/ssh-config
 $ brew install jq
 ```
 
-直接使用 `main` 就能使用：
+> 我的 `PATH` 有添加 `$HOME/tools`，所以請依照自身習慣調配。
+
+### Linux
 
 ```bash
-$ cd ssh-config
-$ ./main
-Usage: ./main [OPTION] 
+$ git clone https://github.com/48763/ssh-config.git
+$ ln -s ssh-config/ssh-config /usr/local/bin/ssh-config
+$ apt-get update && apt-get install jq
+```
+
+---
+
+下載與設定完畢後，就能直接使用 `ssh-config`：
+
+```bash
+$ ssh-config
+Usage: ssh-config [OPTION] 
 
 	aws		Use *aws* command line to auto-generate or delete host config.
 	common		Use command line to generate or delete host config.
@@ -41,10 +53,10 @@ $SSH_CONFIG_DIR=./ssh
 
 ## 一般
 
-`main common` 會透過接受的參數，產生對應的遠端配置檔，預設存放路徑 `$SSH_CONFIG_DIR/default`。
+`ssh-config common` 會透過接受的參數，產生對應的遠端配置檔，預設存放路徑 `$SSH_CONFIG_DIR/default`。
 
 ```
-Usage: ./main common [OPTION] 
+Usage: ssh-config common [OPTION] 
 
 	add		Add host config at folder.
 	delete		Delete host config at folder.
@@ -74,7 +86,7 @@ Usage: ./main common [OPTION]
 #### 範例
 
 ```
-$ ./main add -h 48763 -a 127.0.0.1 -i ~/.ssh/id_rsa -u yuki -p 2222 -f test
+$ ssh-config add -h 48763 -a 127.0.0.1 -i ~/.ssh/id_rsa -u yuki -p 2222 -f test
 
 Host 48763
     HostName 127.0.0.1
@@ -85,11 +97,11 @@ Host 48763
 
 ## AWS
 
-`main aws` 會透過 **AWS** 的指令獲取主機資訊，以產生遠端配置檔。
+`ssh-config aws` 會透過 **AWS** 的指令獲取主機資訊，以產生遠端配置檔。
 
 ```bash
-$ ./main aws 
-Usage: ./main aws [OPTION] 
+$ ssh-config aws 
+Usage: ssh-config aws [OPTION] 
 
 	gen		Generate aws host config with profile of aws.
 	delete		Delete aws profile folder of host config.
@@ -101,10 +113,10 @@ Usage: ./main aws [OPTION]
 
 ### 生成配置
 
-`main aws gen` 的使用如下 
+`ssh-config aws gen` 的使用如下 
 
 ```bash
-$ ./main aws gen [OPTIONS]
+$ ssh-config aws gen [OPTIONS]
 ```
 
 | 選項 | 說明 |
@@ -120,7 +132,7 @@ $ ./main aws gen [OPTIONS]
 #### 使用範例
 
 ```
-$ ./main aws gen -P -p tw -u yuki
+$ ssh-config aws gen -P -p tw -u yuki
 
 Host tokyo-48763
     HostName 8.8.8.8
