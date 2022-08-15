@@ -1,4 +1,9 @@
 #!/bin/bash
+script_path=$(readlink $(command -v ssh-config))
+if [ -n "${script_path}" ]; then 
+    cd ${script_path%/*}
+fi
+
 source .ssh.conf
 ARGC="${#}"
 ERR=$(getopt -o a:g:h:u: -l ip-address:,group:,host:,user: -- ${@} 2>&1 1>/dev/null)
