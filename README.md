@@ -16,7 +16,7 @@
 
 ```bash
 $ git clone https://github.com/48763/ssh-config.git
-$ ln -s ssh-config/ssh-config ~/tools/ssh-config
+$ ln -s ssh-config/ssh-config $(HOME)/tools/ssh-config
 $ brew install jq
 ```
 
